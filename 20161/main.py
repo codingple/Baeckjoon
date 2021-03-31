@@ -23,22 +23,25 @@ def check_already(stat,node,depth):
     return True
 
 def check_same(stat):
+    cnt = 0
     for i in range(N):
         if stat[i] != wannabe[i]:
-            return False
-    return True
+            cnt += 1
+    return cnt
 
 def bfs():
     q = deque()
     global stat
-    q.append([copy.deepcopy(stat), 0])
+
+    q.append([copy.deepcopy(stat), 0, check_same(stat)])
 
     while len(q):
         crnt = q.popleft()
         crnt_stat = crnt[0]
         crnt_cnt = crnt[1]
+        crnt_diff = crnt[2]
 
-        if check_same(crnt_stat):
+        if not crnt_diff:
             return crnt_cnt
 
         head = 0
@@ -50,8 +53,10 @@ def bfs():
                 for i in range(head,rear+1):
                     if i != j:
                         nw_stat[i] = (nw_stat[i] + 1) % 2
-                if not check_already(nw_stat,already,0):
-                    q.append([nw_stat,crnt_cnt+1])
+                nw_diff = check_same(nw_stat)
+                if not check_already(nw_stat,already,0) and\
+                    nw_diff <= crnt_diff:
+                    q.append([nw_stat,crnt_cnt+1,nw_diff])
                     push_already(nw_stat,already,0)
             head += 1
             rear += 1
